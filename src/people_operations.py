@@ -3,9 +3,10 @@ import os
 from datetime import datetime
 
 class PersonDatabase:
-    def __init__(self, filename="people_database.json"):
+    def __init__(self, filename="database/people_database.json"):
         self.filename = filename
         self.data = self._load_database()
+        self._save_database()
 
     def _load_database(self):
         """Load database from file or create new one"""
@@ -93,6 +94,17 @@ class PersonDatabase:
     def get_all_people(self):
         """Get list of all people in database"""
         return list(self.data['people'].values())
+    
+    def get_all_people_cpfs(self):
+        """Get list of all people in database"""
+        return list(self.data['people'].keys())
+    
+    def get_all_people_names(self):
+        """Get list of all people in database"""
+        simple_dict = {}
+        for cpf in list(self.data['people'].keys()):
+            simple_dict[self.data['people'][cpf]["name"]] = cpf
+        return simple_dict
     
     def get_dental_procedure(self, cpf, procedure_id):
         """Retrieve a dental_procedure's data by CPF"""
