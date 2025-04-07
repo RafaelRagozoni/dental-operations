@@ -115,6 +115,10 @@ class PersonDatabase:
     def get_person_dental_procedures(self, cpf):
         """Get list of all dental_procedure for person"""
         return list(self.data['people'][cpf]["procedures"].values())
+    
+    def get_person_dental_procedures_id(self, cpf):
+        """Get list of all dental_procedure for person"""
+        return list(self.data['people'][cpf]["procedures"].keys())
 
     def delete_person(self, cpf):
         """Remove a person from the database"""

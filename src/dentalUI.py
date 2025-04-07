@@ -22,14 +22,20 @@ def showPerson():
     label_phone.setText(person["phone"])
     label_number_procedure.setText(f"{number_procedure}")
     btnVerOpc.setText(f"Ver Operações de {comboBoxPacientes.currentText()}")
+    label_name_in_procedure.setText(current_name)
+    label_cpf_in_procedure.setText(current_cpf)
 
 def abrir_janela_opcs():
     janelaOperations.setWindowTitle(comboBoxPacientes.currentText())
     janelaOperations.show()
+    procedures_id = db.get_person_dental_procedures_id(label_cpf_in_procedure.text())
+    comboBoxProcedures.addItems(procedures_id)
+    print(procedures_id)
     janelaPessoas.destroy()
 
 def abrir_janela_pacientes():
     janelaPessoas.setWindowTitle("Pacientes do Dr. Sismoto")
+    comboBoxProcedures.clear()
     janelaPessoas.show()
     janelaOperations.destroy()
 
@@ -38,9 +44,6 @@ app = QApplication(sys.argv)
 janelaPessoas = QWidget()
 janelaPessoas.resize(900,500)
 janelaPessoas.setWindowTitle("Operações dentais do Dr. Sismoto")
-
-janelaOperations = QWidget()
-janelaOperations.resize(1600,900)
 
 comboBoxPacientes = QComboBox(janelaPessoas)
 comboBoxPacientes.addItems(names)
@@ -103,9 +106,35 @@ btnVerOpc = QPushButton("Ver Operações do paciente", janelaPessoas)
 btnVerOpc.setGeometry(400,20,400,50)
 btnVerOpc.clicked.connect(abrir_janela_opcs)
 
+#Janela de operações
+janelaOperations = QWidget()
+janelaOperations.resize(1600,900)
+
 btn3 = QPushButton("Voltar para pacientes", janelaOperations)
 btn3.setGeometry(400,20,400,50)
 btn3.clicked.connect(abrir_janela_pacientes)
+
+comboBoxProcedures = QComboBox(janelaOperations)
+comboBoxProcedures.move(20,40)
+comboBoxProcedures.currentIndexChanged.connect(showPerson)
+
+static_label_name_in_procedure = QLabel("Nome: ", janelaOperations)
+static_label_name_in_procedure.move(20,220)
+static_label_name_in_procedure.setStyleSheet('font-size:20px')
+
+static_label_cpf_in_procedure = QLabel("CPF: ", janelaOperations)
+static_label_cpf_in_procedure.move(20,270)
+static_label_cpf_in_procedure.setStyleSheet('font-size:20px')
+
+label_name_in_procedure = QLabel("", janelaOperations)
+label_name_in_procedure.move(300,220)
+label_name_in_procedure.setStyleSheet('font-size:20px')
+
+label_cpf_in_procedure = QLabel("", janelaOperations)
+label_cpf_in_procedure.move(300,270)
+label_cpf_in_procedure.setStyleSheet('font-size:20px')
+
+
 
 # btn.setStyleSheet('background-color:black;color:yellow')
 
