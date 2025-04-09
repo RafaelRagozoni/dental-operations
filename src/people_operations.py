@@ -10,6 +10,8 @@ class PersonDatabase:
 
     def _load_database(self):
         """Load database from file or create new one"""
+        if not os.path.exists('database/'):
+            os.makedirs('database/')
         if os.path.exists(self.filename):
             with open(self.filename, 'r') as file:
                 return json.load(file)
@@ -42,14 +44,15 @@ class PersonDatabase:
         self._save_database()
         return True
     
-    def add_dental_procedure(self, cpf, date, procedures, notes = "", **kwargs):
+    def add_dental_procedure(self, cpf, date, dentes, procedures, notes = "", **kwargs):
         """Add a new dental procedure to the database"""
         if cpf not in self.data['people']:
             return
         procedure_id =  self.data['people'][cpf].get("last_procedure_id",0)+1
         dental_data = {
-            "date": date,
+            "dentes": dentes,
             "procedures": procedures, 
+            "date": date,
             "notes": notes,
             **kwargs
         }
@@ -152,30 +155,3 @@ class PersonDatabase:
             if match:
                 results.append(person)
         return results
-
-# Example usage
-if __name__ == "__main__":
-    db = PersonDatabase()
-    
-    # Add new person
-    db.add_person(
-        cpf="12345678900",
-        name="John Doe",
-        birth_date="1990-01-01",
-        phone="+5511999999999"
-    )
-    
-    # Update person
-    db.update_person("12345678900", phone="+5511999999999")
-    
-    # Get person
-    person = db.get_person("12345678900")
-    print("Retrieved person:", person)
-    
-    # Search example
-    results = db.search(name="Johnathan Doe")
-    print("Search results:", results)
-    
-    # List all
-    all_people = db.list_all_people()
-    print("All entries:", all_people)
