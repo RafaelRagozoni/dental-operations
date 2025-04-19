@@ -3,142 +3,68 @@ import json
 import os
 from datetime import datetime
 from PyQt6.QtWidgets import QApplication, QWidget, QPushButton, QLabel, QLineEdit, QComboBox
-import people_operations as po
-
-db = po.PersonDatabase()
-people_cpfs = db.get_all_people_names()
-names = list(people_cpfs.keys())
-cpfs = list(people_cpfs.values())
-
-def showPerson():
-    current_name = comboBoxPacientes.currentText()
-    current_cpf = people_cpfs[comboBoxPacientes.currentText()]
-    person = db.get_person(current_cpf)
-    number_procedure = person["last_procedure_id"]
-    label_cpf.setText(current_cpf)
-    label_name.setText(current_name)
-    label_last_seen.setText(person["last_seen"])
-    label_birthday.setText(person["birth_date"])
-    label_phone.setText(person["phone"])
-    label_number_procedure.setText(f"{number_procedure}")
-    btnVerOpc.setText(f"Ver Operações de {comboBoxPacientes.currentText()}")
-    label_name_in_procedure.setText(current_name)
-    label_cpf_in_procedure.setText(current_cpf)
-
-def abrir_janela_opcs():
-    janelaOperations.setWindowTitle(comboBoxPacientes.currentText())
-    janelaOperations.show()
-    procedures_id = db.get_person_dental_procedures_id(label_cpf_in_procedure.text())
-    comboBoxProcedures.addItems(procedures_id)
-    print(procedures_id)
-    janelaPessoas.destroy()
-
-def abrir_janela_pacientes():
-    janelaPessoas.setWindowTitle("Pacientes do Dr. Sismoto")
-    comboBoxProcedures.clear()
-    janelaPessoas.show()
-    janelaOperations.destroy()
-
-app = QApplication(sys.argv)
-
-janelaPessoas = QWidget()
-janelaPessoas.resize(900,500)
-janelaPessoas.setWindowTitle("Operações dentais do Dr. Sismoto")
-
-comboBoxPacientes = QComboBox(janelaPessoas)
-comboBoxPacientes.addItems(names)
-comboBoxPacientes.move(20,40)
-comboBoxPacientes.currentIndexChanged.connect(showPerson)
-
-label_paciente = QLabel("Paciente", janelaPessoas)
-label_paciente.move(21,10)
-label_paciente.setStyleSheet('font-size:20px')
-
-label_name = QLabel("", janelaPessoas)
-label_name.move(300,220)
-label_name.setStyleSheet('font-size:20px')
-
-label_cpf = QLabel("", janelaPessoas)
-label_cpf.move(300,270)
-label_cpf.setStyleSheet('font-size:20px')
-
-label_birthday = QLabel("", janelaPessoas)
-label_birthday.move(300,320)
-label_birthday.setStyleSheet('font-size:20px')
-
-label_last_seen = QLabel("", janelaPessoas)
-label_last_seen.move(300,370)
-label_last_seen.setStyleSheet('font-size:20px')
-
-label_phone = QLabel("", janelaPessoas)
-label_phone.move(300,420)
-label_phone.setStyleSheet('font-size:20px')
-
-label_number_procedure = QLabel("", janelaPessoas)
-label_number_procedure.move(300,470)
-label_number_procedure.setStyleSheet('font-size:20px')
-
-static_label_name = QLabel("Nome: ", janelaPessoas)
-static_label_name.move(20,220)
-static_label_name.setStyleSheet('font-size:20px')
-
-static_label_cpf = QLabel("CPF", janelaPessoas)
-static_label_cpf.move(20,270)
-static_label_cpf.setStyleSheet('font-size:20px')
-
-static_label_birthday = QLabel("Dia de nascimento", janelaPessoas)
-static_label_birthday.move(20,320)
-static_label_birthday.setStyleSheet('font-size:20px')
-
-static_label_last_seen = QLabel("Data ultima consulta", janelaPessoas)
-static_label_last_seen.move(20,370)
-static_label_last_seen.setStyleSheet('font-size:20px')
-
-static_label_phone = QLabel("Telefone", janelaPessoas)
-static_label_phone.move(20,420)
-static_label_phone.setStyleSheet('font-size:20px')
-
-static_label_number_procedure = QLabel("Numero de Procedimentos", janelaPessoas)
-static_label_number_procedure.move(20,470)
-static_label_number_procedure.setStyleSheet('font-size:20px')
-
-btnVerOpc = QPushButton("Ver Operações do paciente", janelaPessoas)
-btnVerOpc.setGeometry(400,20,400,50)
-btnVerOpc.clicked.connect(abrir_janela_opcs)
-
-#Janela de operações
-janelaOperations = QWidget()
-janelaOperations.resize(1600,900)
-
-btn3 = QPushButton("Voltar para pacientes", janelaOperations)
-btn3.setGeometry(400,20,400,50)
-btn3.clicked.connect(abrir_janela_pacientes)
-
-comboBoxProcedures = QComboBox(janelaOperations)
-comboBoxProcedures.move(20,40)
-comboBoxProcedures.currentIndexChanged.connect(showPerson)
-
-static_label_name_in_procedure = QLabel("Nome: ", janelaOperations)
-static_label_name_in_procedure.move(20,220)
-static_label_name_in_procedure.setStyleSheet('font-size:20px')
-
-static_label_cpf_in_procedure = QLabel("CPF: ", janelaOperations)
-static_label_cpf_in_procedure.move(20,270)
-static_label_cpf_in_procedure.setStyleSheet('font-size:20px')
-
-label_name_in_procedure = QLabel("", janelaOperations)
-label_name_in_procedure.move(300,220)
-label_name_in_procedure.setStyleSheet('font-size:20px')
-
-label_cpf_in_procedure = QLabel("", janelaOperations)
-label_cpf_in_procedure.move(300,270)
-label_cpf_in_procedure.setStyleSheet('font-size:20px')
 
 
+class DentalUI:
+    def inicialJanelaPessoas(self):
+        self.janelaPessoas = QWidget()
+        self.janelaPessoas.resize(900,500)
+        self.janelaPessoas.setWindowTitle("Operações dentais do Dr. Sismoto")
 
-# btn.setStyleSheet('background-color:black;color:yellow')
+    def inicialJanelaOperacoes(self):
+        self.janelaOperations = QWidget()
+        self.janelaOperations.resize(1600,900)
+        self.janelaOperations.setWindowTitle("Operações do paciente")
 
-showPerson()
-janelaPessoas.show()
+    def addComboBoxJanela(self, position, janela):
+        comboBox = QComboBox(janela)
+        comboBox.move(position[0], position[1])
+        return comboBox
+    
+    def addLabelJanela(self, text, position, janela, font_size=20):
+        label = QLabel(text, janela)
+        label.move(position[0], position[1])
+        label.setStyleSheet(f'font-size:{font_size}px')
+        return label
+    
+    def addButtonJanela(self, text, geometry, janela):
+        button = QPushButton(text, janela)
+        button.setGeometry(geometry[0], geometry[1], geometry[2], geometry[3])
+        return button
 
-app.exec()
+    def adicionaElementosJanelaPaciente(self):
+        self.combo_box_pacientes = self.addComboBoxJanela((20, 40), self.janelaPessoas)
+        self.label_paciente = self.addLabelJanela("Paciente", (21, 10), self.janelaPessoas)
+        self.label_name = self.addLabelJanela("", (300,220), self.janelaPessoas)
+        self.label_cpf = self.addLabelJanela("", (300,270), self.janelaPessoas)
+        self.label_birthday = self.addLabelJanela("", (300,320), self.janelaPessoas)
+        self.label_last_seen = self.addLabelJanela("", (300,370), self.janelaPessoas)
+        self.label_phone = self.addLabelJanela("", (300,420), self.janelaPessoas)
+        self.label_number_procedure = self.addLabelJanela("", (300,470), self.janelaPessoas)
+        self.static_label_name = self.addLabelJanela("Nome: ", (20,220), self.janelaPessoas)
+        self.static_label_cpf = self.addLabelJanela("CPF", (20,270), self.janelaPessoas) 
+        self.static_label_birthday = self.addLabelJanela("Dia de nascimento", (20,320), self.janelaPessoas)
+        self.static_label_last_seen = self.addLabelJanela("Data ultima consulta", (20,370), self.janelaPessoas)
+        self.static_label_phone = self.addLabelJanela("Telefone", (20,420), self.janelaPessoas)
+        self.static_label_number_procedure = self.addLabelJanela("Numero de Procedimentos", (20,470), self.janelaPessoas)
+        self.btn_ver_opc = self.addButtonJanela("Ver Operações do paciente", (400,20,400,50), self.janelaPessoas)
+
+    def adicionaElementosJanelaOperacoes(self):
+        self.combo_box_procedures = self.addComboBoxJanela((20, 40), self.janelaOperations)
+        self.static_label_name_in_procedure = self.addLabelJanela("Nome: ", (20,220), self.janelaOperations)
+        self.static_label_cpf_in_procedure = self.addLabelJanela("CPF: ", (20,270), self.janelaOperations)
+        self.label_name_in_procedure = self.addLabelJanela("", (300,220), self.janelaOperations)
+        self.label_cpf_in_procedure = self.addLabelJanela("", (300,270), self.janelaOperations)
+        self.btn3 = self.addButtonJanela("Voltar para pacientes", (400,20,400,50), self.janelaOperations)
+
+    def __init__(self):
+        self.inicialJanelaPessoas()
+        self.inicialJanelaOperacoes()
+        self.adicionaElementosJanelaPaciente()
+        self.adicionaElementosJanelaOperacoes()
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    ui = DentalUI()
+    ui.janelaPessoas.show()
+    sys.exit(app.exec())
