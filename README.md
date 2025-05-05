@@ -9,9 +9,11 @@ dental operations crud for pacients
 - using PyInstaller, Auto-py-to-exe or Nuitka to generate executable
 
 # What is missing:
-- try making the app work without anything on the database
-- create a "local" procedure dict to save in the database in the procedures window
-- make the window to save the operations done in the selected teeth
+- [X] try making the app work without anything on the database
+- [X] create a "local" procedure dict to save in the database in the procedures window
+- [ ] make the window to save the operations done in the selected teeth
   - when teeth checkbox checked, open the teeth checkbox with the current operations checked
-- make the logic to save user inputs in the database
-- create the .exe with PyInstaller
+- [X] make the logic to save user inputs in the database
+- [ ] tests and error handling
+- [ ] error messages
+- [ ] create the .exe with PyInstaller
