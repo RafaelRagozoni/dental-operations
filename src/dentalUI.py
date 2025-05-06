@@ -180,8 +180,11 @@ class DentalUI:
         self.static_label_cpf_in_procedure = self.addLabelJanela(
             "CPF: ", (20, 140), self.janelaOperations
         )
+        self.static_label_date = self.addLabelJanela(
+            "Data: ", (20, 190), self.janelaOperations
+        )
         self.static_label_notes = self.addLabelJanela(
-            "notas: ", (20, 190), self.janelaOperations
+            "Notas: ", (20, 240), self.janelaOperations
         )
         self.line_name_in_procedure = self.addLabelJanela(
             "", (150, 90), self.janelaOperations
@@ -189,16 +192,32 @@ class DentalUI:
         self.line_cpf_in_procedure = self.addLabelJanela(
             "", (150, 140), self.janelaOperations
         )
-        self.line_notes = self.addLineEditJanela((20, 220), self.janelaOperations)
+        self.line_date = self.addLabelJanela(
+            "", (150, 190), self.janelaOperations
+        )
+        self.line_date.setFixedWidth(400)
+        self.line_notes = self.addLineEditJanela((20, 270), self.janelaOperations)
         self.line_notes.setFixedSize(800, 100)
         self.line_notes.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.btn3 = self.addButtonJanela(
             "Voltar para pacientes", (400, 20, 400, 50), self.janelaOperations
         )
+        self.btn_nova_consulta = self.addButtonJanela(
+            "Cadastrar nova consulta", (400, 70, 400, 50), self.janelaOperations
+        )
+        self.btn_salvar_consulta = self.addButtonJanela(
+            "Salvar/Atualizar consulta", (400, 120, 400, 50), self.janelaOperations
+        )
+        self.btn_deletar_consulta = self.addButtonJanela(
+            "Deletar consulta", (400, 170, 400, 50), self.janelaOperations
+        )
         self.check_box_dentes = {}
         self.addTeethImages()
 
     def adicionaElementosJanelaProcedimentos(self):
+        self.btn_salvar_procedures = self.addButtonJanela(
+            "Salvar", (400, 500, 400, 50), self.janela_procedimentos
+        )
         self.check_box_procedimentos = {}
         start_x = 10
         start_y = 10

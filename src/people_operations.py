@@ -47,7 +47,7 @@ class PersonDatabase:
         """Add a new dental procedure to the database"""
         if cpf not in self.data["people"]:
             return
-        procedure_id = self.data["people"][cpf].get("last_procedure_id", 0) + 1
+        procedure_id = f"{int(self.data["people"][cpf].get("last_procedure_id", 0)) +1}"
         dental_data = {"date": date, "procedures": procedures, "notes": notes, **kwargs}
 
         self.data["people"][cpf]["procedures"][procedure_id] = dental_data
@@ -129,7 +129,8 @@ class PersonDatabase:
         """Remove a dental_procedure from the database"""
         if cpf not in self.data["people"]:
             raise KeyError(f"CPF {cpf} not found in database")
-        if procedure_id not in self.data["people"]:
+        if procedure_id not in self.data["people"][cpf]["procedures"]:
+            print(self.data["people"][cpf]["procedures"])
             raise KeyError(f"procedure_id {procedure_id} not found in database")
 
         del self.data["people"][cpf]["procedures"][procedure_id]

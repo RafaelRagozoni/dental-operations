@@ -47,7 +47,7 @@ class UserInterfaceActions:
         self.ui.line_cpf_in_procedure.setText(current_cpf)
 
     def cadastrarNovoPaciente(self):
-        self.ui.static_label_name_selected_pacient.setText("Desconhecido")
+        self.ui.static_label_name_selected_pacient.setText("Desconhecido                 ")
         self.ui.line_cpf.setText("")
         self.ui.line_name.setText("")
         self.ui.line_last_seen.setText("")
@@ -92,6 +92,47 @@ class UserInterfaceActions:
             print("Erro ao deletar paciente")
             pass
 
+    def cadastrarNovaConsulta(self):
+        cpf = self.ui.line_cpf_in_procedure.text()
+        new_procedure_id = int(self.db.get_person(cpf)["last_procedure_id"]) + 1
+        self.db.add_dental_procedure(
+            cpf,
+            datetime.now().strftime("%d/%m/%Y"),
+            procedures={},
+            notes=self.ui.line_notes.text(),
+        )
+        self.ui.combo_box_procedures.addItem(str(new_procedure_id))
+        self.ui.combo_box_procedures.setCurrentIndex(self.ui.combo_box_procedures.count() - 1)
+
+    def salvarConsulta(self):
+        try:
+            cpf = self.ui.line_cpf_in_procedure.text()
+            procedure_id = self.db.get_person(cpf)["last_procedure_id"]
+            self.db.update_dental_procedure(
+                cpf,
+                procedure_id,
+                date=self.ui.line_date.text(),
+                notes=self.ui.line_notes.text(),
+            )
+            #message: consulta salva com sucesso
+        except:  # noqa: E722
+            print("Erro ao salvar consulta")
+
+    def deletarConsulta(self):
+        try:
+            procedures_id = self.ui.combo_box_procedures.currentText()
+            cpf = self.ui.line_cpf_in_procedure.text()
+            self.db.delete_dental_procedure(cpf, procedures_id)
+            self.ui.combo_box_procedures.removeItem(
+                self.ui.combo_box_procedures.currentIndex()
+            )
+            self.ui.line_notes.setText("")
+            self.ui.line_date.setText("")
+            self.ui.combo_box_procedures.setCurrentIndex(self.ui.combo_box_procedures.count() - 1)
+        except:  # noqa: E722
+            print("Erro ao deletar consulta")
+    
+
     def abrir_janela_opcs(self):
         self.ui.janelaOperations.setWindowTitle(
             self.ui.combo_box_pacientes.currentText()
@@ -132,9 +173,11 @@ class UserInterfaceActions:
             )
             self.check_itens(procedure_data)
             self.ui.line_notes.setText(procedure_data["notes"])
-
+            self.ui.line_date.setText(procedure_data["date"])
         except:  # noqa: E722
             self.ui.line_notes.setText("")
+            now = datetime.now().strftime("%d/%m/%Y")
+            self.ui.line_date.setText(f"{now}")
             pass
 
     def check_itens(self, procedure_data):
@@ -164,6 +207,15 @@ class UserInterfaceActions:
             self.ui.btn_atualizar_paciente, self.atualizarDadosPaciente
         )
         self.connect_btn_functions(self.ui.btn_delete_paciente, self.deletePaciente)
+        self.connect_btn_functions(
+            self.ui.btn_nova_consulta, self.cadastrarNovaConsulta
+        )
+        self.connect_btn_functions(
+            self.ui.btn_salvar_consulta, self.salvarConsulta
+        )
+        self.connect_btn_functions(
+            self.ui.btn_deletar_consulta, self.deletarConsulta
+        )
         self.add_itens_combo_box(self.ui.combo_box_pacientes, self.names)
         for checkBox in self.ui.check_box_dentes.values():
             self.connect_check_box_functions(checkBox, self.abrir_janela_procedimentos)
