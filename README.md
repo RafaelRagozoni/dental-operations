@@ -14,6 +14,8 @@ dental operations crud for pacients
 - [ ] make the window to save the operations done in the selected teeth
   - when teeth checkbox checked, open the teeth checkbox with the current operations checked
 - [X] make the logic to save user inputs in the database
+- [X] Save the teeth operations
 - [ ] tests and error handling
 - [ ] error messages
 - [ ] create the .exe with PyInstaller
+- [ ] pdf creator
