@@ -47,7 +47,8 @@ class PersonDatabase:
         """Add a new dental procedure to the database"""
         if cpf not in self.data["people"]:
             return
-        procedure_id = f"{int(self.data["people"][cpf].get("last_procedure_id", 0)) +1}"
+        local_id = int(self.data["people"][cpf].get("last_procedure_id", 0)) + 1
+        procedure_id = f"{local_id}"
         dental_data = {"date": date, "procedures": procedures, "notes": notes, **kwargs}
 
         self.data["people"][cpf]["procedures"][procedure_id] = dental_data
@@ -82,7 +83,6 @@ class PersonDatabase:
 
         self._save_database()
         return True
-    
 
     def get_person(self, cpf):
         """Retrieve a person's data by CPF"""
@@ -108,7 +108,7 @@ class PersonDatabase:
         if cpf not in self.data["people"]:
             raise KeyError(f"cpf {cpf} not found in database")
         return self.data["people"][cpf]["procedures"].get(procedure_id, None)
-    
+
     def get_person_dental_procedures(self, cpf):
         """Get list of all dental_procedure for person"""
         return list(self.data["people"][cpf]["procedures"].values())
@@ -116,18 +116,20 @@ class PersonDatabase:
     def get_person_dental_procedures_id(self, cpf):
         """Get list of all dental_procedure for person"""
         return list(self.data["people"][cpf]["procedures"].keys())
-    
+
     def get_dental_operations(self, cpf):
         """Retrieve a dental_procedure's data by CPF"""
         if cpf not in self.data["people"]:
             raise KeyError(f"cpf {cpf} not found in database")
         return self.data["people"][cpf]["procedures"].get("procedures", {})
-    
+
     def get_dental_operations_on_tooth(self, cpf, procedure_id, tooth_id):
         """Retrieve a dental_procedure's data by CPF"""
         if cpf not in self.data["people"]:
             raise KeyError(f"cpf {cpf} not found in database")
-        return self.data["people"][cpf]["procedures"][procedure_id]["procedures"].get(tooth_id, [])
+        return self.data["people"][cpf]["procedures"][procedure_id]["procedures"].get(
+            tooth_id, []
+        )
 
     def delete_person(self, cpf):
         """Remove a person from the database"""
