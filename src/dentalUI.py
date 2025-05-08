@@ -103,7 +103,6 @@ class DentalUI:
         for image_file in os.listdir(images_path):
             image_path = os.path.join(images_path, image_file)
             tooth_id = image_file[:-4]
-            print(tooth_id)
             self.addPixMapJanela(image_path, (start_x, start_y), self.janelaOperations)
             self.check_box_dentes[tooth_id] = self.addCheckBoxJanela(
                 (start_x + 5, start_y + checkbox_y), self.janelaOperations

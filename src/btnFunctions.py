@@ -105,18 +105,20 @@ class UserInterfaceActions:
         self.ui.combo_box_procedures.setCurrentIndex(self.ui.combo_box_procedures.count() - 1)
 
     def salvarConsulta(self):
-        try:
-            cpf = self.ui.line_cpf_in_procedure.text()
-            procedure_id = self.db.get_person(cpf)["last_procedure_id"]
-            self.db.update_dental_procedure(
-                cpf,
-                procedure_id,
-                date=self.ui.line_date.text(),
-                notes=self.ui.line_notes.text(),
-            )
-            #message: consulta salva com sucesso
-        except:  # noqa: E722
-            print("Erro ao salvar consulta")
+        cpf = self.ui.line_cpf_in_procedure.text()
+        procedure_id = self.ui.combo_box_procedures.currentText()
+        teeth_operated = {}
+        for teeth_id, checkBox in self.ui.check_box_dentes.items():
+            if checkBox.isChecked():
+                teeth_operated[teeth_id] = []
+        
+        self.db.update_dental_procedure(
+            cpf,
+            procedure_id,
+            date=self.ui.line_date.text(),
+            notes=self.ui.line_notes.text(),
+            procedures=teeth_operated
+        )
 
     def deletarConsulta(self):
         try:
@@ -132,6 +134,22 @@ class UserInterfaceActions:
         except:  # noqa: E722
             print("Erro ao deletar consulta")
     
+    def salvarProcedimentoNoDente(self):
+        cpf = self.ui.line_cpf_in_procedure.text()
+        procedure_id = self.ui.combo_box_procedures.currentText()
+        procedures_done = self.db.get_dental_operations(cpf)
+        print(procedures_done)
+        procedures_done[self.tooth_id_reference] = procedures_done.get(self.tooth_id_reference, [])
+        for procedure_done, checkBox in self.ui.check_box_procedimentos.items():
+            if checkBox.isChecked():
+                procedures_done[self.tooth_id_reference].append(procedure_done) 
+
+        print(procedures_done)
+        self.db.update_dental_procedure(
+            cpf,
+            procedure_id,
+            procedures=procedures_done
+        )
 
     def abrir_janela_opcs(self):
         self.ui.janelaOperations.setWindowTitle(
@@ -150,14 +168,23 @@ class UserInterfaceActions:
         self.ui.janelaPessoas.show()
         self.ui.janelaOperations.destroy()
 
-    def abrir_janela_procedimentos(self, checked):
+    def abrir_janela_procedimentos(self, tooth_id,checked):
         if not checked:
             try:
                 self.ui.janela_procedimentos.destroy()
             except:  # noqa: E722
                 pass
             return
-        self.ui.janela_procedimentos.setWindowTitle("Procedimentos no Dente")
+        self.ui.janela_procedimentos.setWindowTitle(f"Procedimentos no Dente {tooth_id}")
+        cpf = self.ui.line_cpf_in_procedure.text()
+        procedure_id = self.ui.combo_box_procedures.currentText()
+        procedures = self.db.get_dental_operations_on_tooth(cpf, procedure_id, tooth_id)
+        print(procedures)
+        for procedure in self.ui.check_box_procedimentos.keys():
+            self.ui.check_box_procedimentos[procedure].setChecked(False)
+        for procedure in procedures:
+            self.ui.check_box_procedimentos[procedure].setChecked(True)
+        self.tooth_id_reference = int(tooth_id)
         self.ui.janela_procedimentos.show()
 
     def uncheck_itens(self):
@@ -181,8 +208,9 @@ class UserInterfaceActions:
             pass
 
     def check_itens(self, procedure_data):
-        for procedure_id in procedure_data["procedure"]:
+        for procedure_id in procedure_data["procedures"]:
             self.ui.check_box_dentes[f"{procedure_id}"].setChecked(True)
+        self.ui.janela_procedimentos.destroy()
 
     def add_itens_combo_box(self, comboBox, itens):
         comboBox.addItems(itens)
@@ -216,9 +244,15 @@ class UserInterfaceActions:
         self.connect_btn_functions(
             self.ui.btn_deletar_consulta, self.deletarConsulta
         )
+        self.connect_btn_functions(
+            self.ui.btn_salvar_procedures, self.salvarProcedimentoNoDente
+        )
         self.add_itens_combo_box(self.ui.combo_box_pacientes, self.names)
-        for checkBox in self.ui.check_box_dentes.values():
-            self.connect_check_box_functions(checkBox, self.abrir_janela_procedimentos)
+        for tooth_id in self.ui.check_box_dentes.keys():
+            self.ui.check_box_dentes[tooth_id].toggled.connect(
+                lambda checked, key=tooth_id: self.abrir_janela_procedimentos(key, checked)
+            )
+
 
 
 # if __name__ == "__main__":
