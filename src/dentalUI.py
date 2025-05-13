@@ -62,7 +62,7 @@ class DentalUI:
 
     def inicialJanelaPrecos(self):
         self.janela_precos = QWidget()
-        self.janela_precos.resize(1200, 600)
+        self.janela_precos.resize(1200, 700)
         self.janela_precos.setWindowTitle("Custo por cada procedimento")
 
     def addComboBoxJanela(self, position, janela):
@@ -213,6 +213,9 @@ class DentalUI:
         self.btn_deletar_consulta = self.addButtonJanela(
             "Deletar consulta", (400, 170, 400, 50), self.janelaOperations
         )
+        self.btn_gerar_pdf = self.addButtonJanela(
+            "Gerar pdf", (400, 170, 400, 50), self.janelaOperations
+        )
         self.check_box_dentes = {}
         self.addTeethImages()
 
@@ -238,29 +241,38 @@ class DentalUI:
                 start_x = 10
                 start_y += 50
 
-    def adicionaElementosJanelaPrecos(self):
+    def extract_procedure_mapping(self, procedure_data):
+        procedure_mapping = {}
+        for tooth, procedures in procedure_data["procedures"].items():
+            for procedure in procedures:
+                if procedure not in procedure_mapping:
+                    procedure_mapping[procedure] = []
+                procedure_mapping[procedure].append(tooth)
+        return procedure_mapping
+
+    def adicionaElementosJanelaPrecos(self, procedure_mapping):
         start_x = 10
         start_y = 10
-        for procedimento in procedimentos:
-            self.check_box_procedimentos[procedimento] = self.addCheckBoxJanela(
-                (start_x, start_y), self.janela_procedimentos
-            )
-            self.check_box_procedimentos[procedimento].setStyleSheet(
-                "QCheckBox::indicator { width: 20px; height: 20px;}"
-            )
+        self.btn_salva_pdf = self.addButtonJanela(
+            "Salvar", (900, 600, 250, 50), self.janela_precos
+        )
+        
+        for procedimento in procedure_mapping.keys():
             self.addLabelJanela(
-                procedimento, (start_x + 30, start_y), self.janela_procedimentos
+                procedimento, (start_x, start_y), self.janela_precos
+            )
+            self.addLineEditJanela(
+                (start_x, start_y + 25), self.janela_precos
             )
             start_x += 400
             if start_x > 1200:
                 start_x = 10
-                start_y += 50
+                start_y += 60
 
     def __init__(self):
         self.inicialJanelaPessoas()
         self.inicialJanelaOperacoes()
         self.inicialJanelaProcedimentos()
-        self.inicialJanelaPrecos()
         self.adicionaElementosJanelaProcedimentos()
         self.adicionaElementosJanelaPaciente()
         self.adicionaElementosJanelaOperacoes()

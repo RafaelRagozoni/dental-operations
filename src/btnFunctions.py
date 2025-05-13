@@ -186,6 +186,20 @@ class UserInterfaceActions:
             self.ui.check_box_procedimentos[procedure].setChecked(True)
         self.tooth_id_reference = int(tooth_id)
         self.ui.janela_procedimentos.show()
+    
+    def abrir_janela_precos(self):
+        procedure_mapping = {}
+        procedures_id = self.ui.combo_box_procedures.currentText()
+        procedure_data = self.db.get_dental_procedure(self.ui.line_cpf_in_procedure.text(), procedures_id)
+        for tooth, procedures in procedure_data["procedures"].items():
+            for procedure in procedures:
+                if procedure not in procedure_mapping:
+                    procedure_mapping[procedure] = []
+                procedure_mapping[procedure].append(tooth)
+        self.ui.inicialJanelaPrecos()
+        self.ui.adicionaElementosJanelaPrecos(procedure_mapping)
+        self.ui.janela_precos.show()
+
 
     def uncheck_itens(self):
         for procedure_id in self.ui.check_box_dentes.keys():
@@ -246,6 +260,9 @@ class UserInterfaceActions:
         )
         self.connect_btn_functions(
             self.ui.btn_salvar_procedures, self.salvarProcedimentoNoDente
+        )
+        self.connect_btn_functions(
+            self.ui.btn_gerar_pdf, self.abrir_janela_precos
         )
         self.add_itens_combo_box(self.ui.combo_box_pacientes, self.names)
         for tooth_id in self.ui.check_box_dentes.keys():

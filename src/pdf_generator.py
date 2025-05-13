@@ -55,14 +55,7 @@ class PDFGenerator:
         c.save()
         print("PDF criado com sucesso.")
 
-    def extract_procedure_mapping(self, procedure_data):
-        procedure_mapping = {}
-        for tooth, procedures in procedure_data["procedures"].items():
-            for procedure in procedures:
-                if procedure not in procedure_mapping:
-                    procedure_mapping[procedure] = []
-                procedure_mapping[procedure].append(tooth)
-        return procedure_mapping
+    
 
 
 if __name__ == "__main__":
