@@ -60,6 +60,11 @@ class DentalUI:
         self.janela_procedimentos.resize(1200, 600)
         self.janela_procedimentos.setWindowTitle("Operações do paciente")
 
+    def inicialJanelaPrecos(self):
+        self.janela_precos = QWidget()
+        self.janela_precos.resize(1200, 600)
+        self.janela_precos.setWindowTitle("Custo por cada procedimento")
+
     def addComboBoxJanela(self, position, janela):
         comboBox = QComboBox(janela)
         comboBox.move(position[0], position[1])
@@ -191,9 +196,7 @@ class DentalUI:
         self.line_cpf_in_procedure = self.addLabelJanela(
             "", (150, 140), self.janelaOperations
         )
-        self.line_date = self.addLabelJanela(
-            "", (150, 190), self.janelaOperations
-        )
+        self.line_date = self.addLabelJanela("", (150, 190), self.janelaOperations)
         self.line_date.setFixedWidth(400)
         self.line_notes = self.addLineEditJanela((20, 270), self.janelaOperations)
         self.line_notes.setFixedSize(800, 100)
@@ -235,10 +238,29 @@ class DentalUI:
                 start_x = 10
                 start_y += 50
 
+    def adicionaElementosJanelaPrecos(self):
+        start_x = 10
+        start_y = 10
+        for procedimento in procedimentos:
+            self.check_box_procedimentos[procedimento] = self.addCheckBoxJanela(
+                (start_x, start_y), self.janela_procedimentos
+            )
+            self.check_box_procedimentos[procedimento].setStyleSheet(
+                "QCheckBox::indicator { width: 20px; height: 20px;}"
+            )
+            self.addLabelJanela(
+                procedimento, (start_x + 30, start_y), self.janela_procedimentos
+            )
+            start_x += 400
+            if start_x > 1200:
+                start_x = 10
+                start_y += 50
+
     def __init__(self):
         self.inicialJanelaPessoas()
         self.inicialJanelaOperacoes()
         self.inicialJanelaProcedimentos()
+        self.inicialJanelaPrecos()
         self.adicionaElementosJanelaProcedimentos()
         self.adicionaElementosJanelaPaciente()
         self.adicionaElementosJanelaOperacoes()
