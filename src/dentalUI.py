@@ -214,7 +214,7 @@ class DentalUI:
             "Deletar consulta", (400, 170, 400, 50), self.janelaOperations
         )
         self.btn_gerar_pdf = self.addButtonJanela(
-            "Gerar pdf", (400, 170, 400, 50), self.janelaOperations
+            "Gerar pdf", (400, 220, 400, 50), self.janelaOperations
         )
         self.check_box_dentes = {}
         self.addTeethImages()
@@ -253,13 +253,19 @@ class DentalUI:
     def adicionaElementosJanelaPrecos(self, procedure_mapping):
         start_x = 10
         start_y = 10
+        self.procedures_labels = {}
+        self.procedures_prices = {}
         self.btn_salva_pdf = self.addButtonJanela(
-            "Salvar", (900, 600, 250, 50), self.janela_precos
+            "Gerar pdf", (900, 600, 250, 50), self.janela_precos
         )
 
         for procedimento in procedure_mapping.keys():
-            self.addLabelJanela(procedimento, (start_x, start_y), self.janela_precos)
-            self.addLineEditJanela((start_x, start_y + 25), self.janela_precos)
+            self.procedures_labels[procedimento] = self.addLabelJanela(
+                procedimento, (start_x, start_y), self.janela_precos
+            )
+            self.procedures_prices[procedimento] = self.addLineEditJanela(
+                (start_x, start_y + 25), self.janela_precos
+            )
             start_x += 400
             if start_x > 1200:
                 start_x = 10

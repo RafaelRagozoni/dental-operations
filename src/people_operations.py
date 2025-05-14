@@ -4,8 +4,10 @@ from datetime import datetime
 
 
 class PersonDatabase:
-    def __init__(self, filename="database/people_database.json"):
+    def __init__(self, filename="pdfs/database/people_database.json"):
         self.filename = filename
+        # Ensure the directory for the database file exists
+        os.makedirs(os.path.dirname(self.filename), exist_ok=True)
         self.data = self._load_database()
         self._save_database()
 

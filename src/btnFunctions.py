@@ -5,6 +5,7 @@ from datetime import datetime
 from PyQt6.QtWidgets import QApplication
 import src.dentalUI as dental_ui
 import src.people_operations as po
+import src.pdf_generator as pdf_gen
 # import dentalUI as dental_ui
 # import people_operations as po
 
@@ -143,17 +144,14 @@ class UserInterfaceActions:
     def salvarProcedimentoNoDente(self):
         cpf = self.ui.line_cpf_in_procedure.text()
         procedure_id = self.ui.combo_box_procedures.currentText()
-        # procedures_done = self.db.get_dental_operations(cpf)
         procedures_done = self.db.get_dental_procedure(cpf, procedure_id).get(
             "procedures", {}
         )
         print(f"procedimentos no dente {procedures_done}")
-        procedures_done[self.tooth_id_reference] = procedures_done.get(
-            self.tooth_id_reference, []
-        )
+        procedures_done[f"{self.tooth_id_reference}"] = []
         for procedure_done, checkBox in self.ui.check_box_procedimentos.items():
             if checkBox.isChecked():
-                procedures_done[self.tooth_id_reference].append(procedure_done)
+                procedures_done[f"{self.tooth_id_reference}"].append(procedure_done)
 
         print(procedures_done)
         self.db.update_dental_procedure(cpf, procedure_id, procedures=procedures_done)
@@ -197,19 +195,42 @@ class UserInterfaceActions:
         self.ui.janela_procedimentos.show()
 
     def abrir_janela_precos(self):
-        procedure_mapping = {}
+        self.procedure_mapping = {}
         procedures_id = self.ui.combo_box_procedures.currentText()
         procedure_data = self.db.get_dental_procedure(
             self.ui.line_cpf_in_procedure.text(), procedures_id
         )
         for tooth, procedures in procedure_data["procedures"].items():
             for procedure in procedures:
-                if procedure not in procedure_mapping:
-                    procedure_mapping[procedure] = []
-                procedure_mapping[procedure].append(tooth)
+                if procedure not in self.procedure_mapping:
+                    self.procedure_mapping[procedure] = []
+                self.procedure_mapping[procedure].append(tooth)
         self.ui.inicialJanelaPrecos()
-        self.ui.adicionaElementosJanelaPrecos(procedure_mapping)
+        self.ui.adicionaElementosJanelaPrecos(self.procedure_mapping)
+        self.connect_btn_functions(self.ui.btn_salva_pdf, self.salvar_pdf)
         self.ui.janela_precos.show()
+
+    def salvar_pdf(self):
+        pacient_name = self.ui.line_name_in_procedure.text()
+        procedures_id = self.ui.combo_box_procedures.currentText()
+        procedure_data = self.db.get_dental_procedure(
+            self.ui.line_cpf_in_procedure.text(), procedures_id
+        )
+
+        procedure_prices = {}
+        for procedure in self.procedure_mapping.keys():
+            price_text = self.ui.procedures_prices[procedure].text()
+            if "," in price_text:
+                price_text = price_text.replace(",", ".")
+            procedure_prices[procedure] = price_text
+
+        self.pdf.generate_pdf(
+            pacient_name,
+            procedures_id,
+            procedure_data,
+            procedure_prices,
+            self.procedure_mapping,
+        )
 
     def uncheck_itens(self):
         for procedure_id in self.ui.check_box_dentes.keys():
@@ -245,6 +266,7 @@ class UserInterfaceActions:
         self.names = list(people_cpfs.keys())
         self.cpfs = list(people_cpfs.values())
         self.ui = dental_ui.DentalUI()
+        self.pdf = pdf_gen.PDFGenerator()
         self.connect_combo_box_functions(self.ui.combo_box_pacientes, self.showPerson)
         self.connect_combo_box_functions(
             self.ui.combo_box_procedures, self.show_operation_data

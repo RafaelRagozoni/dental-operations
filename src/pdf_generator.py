@@ -4,15 +4,37 @@ from reportlab.pdfgen import canvas
 
 
 class PDFGenerator:
-    def generate_pdf(self, nome_paciente, procedure_id, procedure_data):
+    def generate_pdf(
+        self,
+        nome_paciente,
+        procedure_id,
+        procedure_data,
+        procedure_prices,
+        procedure_mapping,
+    ):
         """
         Gera um arquivo PDF simples com o ReportLab.
         """
         # Crie um objeto canvas
-        c = canvas.Canvas(f"{nome_paciente}-{procedure_id}.pdf", pagesize=letter)
+        c = canvas.Canvas(f"pdfs/{nome_paciente}-{procedure_id}.pdf", pagesize=letter)
 
         # Defina o título do documento
-        c.setTitle(f"{nome_paciente}-{procedure_id}.pdf")
+        c.setTitle(f"pdfs/{nome_paciente}-{procedure_id}.pdf")
+
+        c.drawString(50, 750, "Nome: ")
+        c.drawString(100, 750, f"{nome_paciente.upper()}")
+
+        c.drawString(400, 750, "Médico: ")
+        c.drawString(450, 750, "João Pedro Sismoto")
+
+        c.drawString(50, 730, "Numero do procedimento: ")
+        c.drawString(200, 730, f"{procedure_id.upper()}")
+
+        c.drawString(400, 730, "Especialidade: ")
+        c.drawString(490, 730, "Clinico Geral")
+
+        c.drawString(50, 710, "Data: ")
+        c.drawString(100, 710, procedure_data["date"])
 
         # Adicione uma imagem ao PDF
         try:
@@ -24,32 +46,34 @@ class PDFGenerator:
         except Exception as e:
             print(f"Erro ao adicionar imagem: {e}")
 
-        procedure_keys = ", ".join(procedure_data["procedures"].keys())
-        numero_de_dentes = len(procedure_data["procedures"].keys())
-        procedure_done = procedure_data["procedures"]["21"][0]
-        procedure_price = procedure_data["valor"]
+        coordenadas_na_linha_cabeçalho = 500
+        c.drawString(10, coordenadas_na_linha_cabeçalho, "Dente")
+        c.drawString(100, coordenadas_na_linha_cabeçalho, "Regiao")
+        c.drawString(200, coordenadas_na_linha_cabeçalho, "Tratamento")
+        c.drawString(450, coordenadas_na_linha_cabeçalho, "Quantidade")
+        c.drawString(525, coordenadas_na_linha_cabeçalho, "Valor")
 
-        # Adicione texto ao PDF
-        c.drawString(50, 750, "Nome: ")
-        c.drawString(50, 730, "Numero do procedimento: ")
-        c.drawString(10, 500, "Dente")
-        c.drawString(110, 500, "Regiao")
-        c.drawString(200, 500, "Tratamento")
-        c.drawString(280, 500, "Dentista")
-        c.drawString(370, 500, "Especialidade")
-        c.drawString(480, 500, "Quantidade")
-        c.drawString(550, 500, "Valor")
+        coordenadas_da_linha_info = coordenadas_na_linha_cabeçalho - 25
+
         c.setFont("Helvetica-Bold", 12)
-        c.drawString(100, 750, f"{nome_paciente.upper()}")
-        c.drawString(200, 730, f"{procedure_id.upper()}")
-        c.drawString(10, 450, procedure_keys)
-        c.drawString(110, 450, "Todo o dente")
-        c.drawString(200, 450, procedure_done)
-        c.drawString(280, 450, "Dr. Sismoto")
-        c.drawString(370, 450, "Clinico Geral")
-        c.drawString(480, 450, f"{numero_de_dentes}")
-        c.drawString(550, 450, f"R${procedure_price}")
 
+        valor_total = 0
+
+        for procedure, lista_dentes in procedure_mapping.items():
+            lista_dentes_str = ", ".join(lista_dentes)
+            numero_de_dentes = len(lista_dentes)
+            valor = numero_de_dentes * float(procedure_prices[procedure])
+            valor_total += valor
+
+            c.drawString(10, coordenadas_da_linha_info, lista_dentes_str)
+            c.drawString(100, coordenadas_da_linha_info, "Todo o dente")
+            c.drawString(200, coordenadas_da_linha_info, procedure)
+            c.drawString(450, coordenadas_da_linha_info, f"{numero_de_dentes}")
+            c.drawString(525, coordenadas_da_linha_info, f"R${valor:.2f}")
+            coordenadas_da_linha_info -= 25
+
+        c.drawString(450, coordenadas_da_linha_info, "TOTAL:")
+        c.drawString(525, coordenadas_da_linha_info, f"R${valor_total:.2f}")
         # Salve o arquivo PDF
         c.showPage()
         c.save()
@@ -64,16 +88,32 @@ if __name__ == "__main__":
     procedure_id = "123456"
 
     procedure_data = {
-        "date": "2025-04-01T15:01:33.010493",
-        "procedures": {"21": ["Cariado (C)"], "22": ["Cariado (C)"]},
+        "date": "14/05/2025",
+        "procedures": {
+            "18": [
+                "Possui les\u00f5a de furca",
+                "Tratamento endod\u00f4ntico realizado",
+            ],
+            "21": [
+                "Possui les\u00f5a de furca",
+                "Tratamento endod\u00f4ntico realizado",
+            ],
+            "37": ["Raiz restaurada"],
+        },
         "notes": "a",
-        "valor": 120,
     }
 
     procedure_prices = {
         "Cariado (C)": 1450,
+        "Possui les\u00f5a de furca": 150,
+        "Tratamento endod\u00f4ntico realizado": 100,
+        "Raiz restaurada": 39.99,
     }
-
-    procedure_mapping = pdf_gen.extract_procedure_mapping(procedure_data)
-    print(procedure_mapping)
-    pdf_gen.generate_pdf(nome_paciente, procedure_id, procedure_data)
+    procedure_mapping = {
+        "Possui les\u00f5a de furca": ["18", "21"],
+        "Tratamento endod\u00f4ntico realizado": ["18", "21"],
+        "Raiz restaurada": ["37"],
+    }
+    pdf_gen.generate_pdf(
+        nome_paciente, procedure_id, procedure_data, procedure_prices, procedure_mapping
+    )
