@@ -103,12 +103,6 @@ class PersonDatabase:
             simple_dict[self.data["people"][cpf]["name"]] = cpf
         return simple_dict
 
-    def get_dental_procedure(self, cpf, procedure_id):
-        """Retrieve a dental_procedure's data by CPF"""
-        if cpf not in self.data["people"]:
-            raise KeyError(f"cpf {cpf} not found in database")
-        return self.data["people"][cpf]["procedures"].get(procedure_id, None)
-
     def get_person_dental_procedures(self, cpf):
         """Get list of all dental_procedure for person"""
         return list(self.data["people"][cpf]["procedures"].values())
@@ -122,6 +116,12 @@ class PersonDatabase:
         if cpf not in self.data["people"]:
             raise KeyError(f"cpf {cpf} not found in database")
         return self.data["people"][cpf]["procedures"].get("procedures", {})
+
+    def get_dental_procedure(self, cpf, procedure_id):
+        """Retrieve a dental_procedure's data by CPF"""
+        if cpf not in self.data["people"]:
+            raise KeyError(f"cpf {cpf} not found in database")
+        return self.data["people"][cpf]["procedures"].get(procedure_id, None)
 
     def get_dental_operations_on_tooth(self, cpf, procedure_id, tooth_id):
         """Retrieve a dental_procedure's data by CPF"""

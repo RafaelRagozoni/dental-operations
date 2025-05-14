@@ -256,14 +256,10 @@ class DentalUI:
         self.btn_salva_pdf = self.addButtonJanela(
             "Salvar", (900, 600, 250, 50), self.janela_precos
         )
-        
+
         for procedimento in procedure_mapping.keys():
-            self.addLabelJanela(
-                procedimento, (start_x, start_y), self.janela_precos
-            )
-            self.addLineEditJanela(
-                (start_x, start_y + 25), self.janela_precos
-            )
+            self.addLabelJanela(procedimento, (start_x, start_y), self.janela_precos)
+            self.addLineEditJanela((start_x, start_y + 25), self.janela_precos)
             start_x += 400
             if start_x > 1200:
                 start_x = 10

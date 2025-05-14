@@ -55,8 +55,6 @@ class PDFGenerator:
         c.save()
         print("PDF criado com sucesso.")
 
-    
-
 
 if __name__ == "__main__":
     # db = po.PersonDatabase()
