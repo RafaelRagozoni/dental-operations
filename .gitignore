@@ -1,0 +1,7 @@
+build
+database
+*.spec
+dist
+pdfs
+people_database.json
+.vscode
